@@ -89,9 +89,9 @@ public class SKSvg : IDisposable
 
     public SkiaModel SkiaModel { get; }
 
-    public SKDrawable? Drawable { get; private set; }
+    public SKDrawable? Drawable { get; set; }
 
-    public SKPicture? Model { get; private set; }
+    public SKPicture? Model { get; set; }
 
     public virtual SkiaSharp.SKPicture? Picture { get; protected set; }
 
