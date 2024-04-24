@@ -27,8 +27,8 @@
   <!--<Import Project="..\..\build\Svg.props" />-->
   <ItemGroup>
     <!--<ProjectReference Include="..\..\externals\SVG\Source\Svg.csproj" />-->
+    <ProjectReference Include="..\..\externals\SVG\Source\Svg.csproj" />
     <ProjectReference Include="..\Svg.Model\Svg.Model.csproj" />
-    <ProjectReference Include="..\Svg.Custom\Svg.Custom.csproj" />
   </ItemGroup>
 
   <ItemGroup>
