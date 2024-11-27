@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <!--<TargetFramework>net9.0</TargetFramework>-->
     <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
     <EnableDefaultItems>False</EnableDefaultItems>
     <NoWarn>CS1591</NoWarn>
@@ -33,6 +34,11 @@
 
   <ItemGroup>
     <Compile Include="**\*.cs" Exclude="obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="SkiaSharp" Version="2.88.9" />
+    <PackageReference Update="SkiaSharp.HarfBuzz" Version="2.88.9" />
   </ItemGroup>
 
 </Project>
