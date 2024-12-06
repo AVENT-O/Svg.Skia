@@ -432,10 +432,10 @@ public class SkiaModel(SKSvgSettings settings)
         }
     }
 
-    public SkiaSharp.SKImageFilter.CropRect? ToCropRect(SKImageFilter.CropRect? cropRect)
-    {
-        return cropRect is null ? null : new(ToSKRect(cropRect.Rect));
-    }
+    //public SkiaSharp.SKImageFilter.CropRect? ToCropRect(SKImageFilter.CropRect? cropRect)
+    //{
+    //    return cropRect is null ? null : new(ToSKRect(cropRect.Rect));
+    //}
 
     public SkiaSharp.SKColorChannel ToSKColorChannel(SKColorChannel colorChannel)
     {
@@ -617,11 +617,12 @@ public class SkiaModel(SKSvgSettings settings)
                     return null;
                 }
 
-                return SkiaSharp.SKImageFilter.CreateImage(
-                    ToSKImage(imageImageFilter.Image),
-                    ToSKRect(imageImageFilter.Src),
-                    ToSKRect(imageImageFilter.Dst),
-                    SkiaSharp.SKFilterQuality.High);
+                    return SkiaSharp.SKImageFilter.CreateImage(ToSKImage(imageImageFilter.Image));
+                //return SkiaSharp.SKImageFilter.CreateImage(
+                //    ToSKImage(imageImageFilter.Image),
+                //    ToSKRect(imageImageFilter.Src),
+                //    ToSKRect(imageImageFilter.Dst),
+                //    SkiaSharp.SKFilterQuality.High);
             }
             case MatrixConvolutionImageFilter matrixConvolutionImageFilter:
             {
@@ -680,18 +681,18 @@ public class SkiaModel(SKSvgSettings settings)
             }
             case PaintImageFilter paintImageFilter:
             {
-                if (paintImageFilter.Paint is null)
-                {
+                    //if (paintImageFilter.Paint is null)
+                    //{
                     return null;
-                }
+                    //}
 
-                return paintImageFilter.Clip is { } clip
-                    ? SkiaSharp.SKImageFilter.CreatePaint(
-                        ToSKPaint(paintImageFilter.Paint),
-                        ToSKRect(clip.Rect))
-                    : SkiaSharp.SKImageFilter.CreatePaint(
-                        ToSKPaint(paintImageFilter.Paint));
-            }
+                    //return paintImageFilter.Clip is { } clip
+                    //    ? SkiaSharp.SKImageFilter.CreatePaint(
+                    //        ToSKPaint(paintImageFilter.Paint),
+                    //        ToSKRect(clip.Rect))
+                    //    : SkiaSharp.SKImageFilter.CreatePaint(
+                    //        ToSKPaint(paintImageFilter.Paint));
+                }
             case ShaderImageFilter shaderImageFilter:
             {
                 if (shaderImageFilter.Shader is null)

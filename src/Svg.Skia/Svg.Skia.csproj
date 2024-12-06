@@ -36,9 +36,4 @@
     <Compile Include="**\*.cs" Exclude="obj\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Update="SkiaSharp" Version="2.88.9" />
-    <PackageReference Update="SkiaSharp.HarfBuzz" Version="2.88.9" />
-  </ItemGroup>
-
 </Project>
