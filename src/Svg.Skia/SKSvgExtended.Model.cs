@@ -5,13 +5,17 @@ namespace Svg.Skia;
 
 public class SKSvgExtended : SKSvg
 {
-    public Dictionary<string, SvgPath> SvgPathPitches { get; private set; } = new();
+    public Dictionary<string, SvgPath> SvgUnits { get; private set; } = new();
 
-    public Dictionary<string, SvgEllipse> SvgPathPhotoLoc { get; private set; } = new();
+    public Dictionary<string, SvgEllipse> SvgPhotoLocations { get; private set; } = new();
 
     public Dictionary<string, SvgRectangle> SvgRectZones { get; private set; } = new();
 
-    public Dictionary<string, SvgPath> SvgPathCamp { get; private set; } = new();
+    public Dictionary<string, SvgPath> SvgCampColor { get; private set; } = new();
+
+    public Dictionary<string, SvgPath> SvgSubunits { get; private set; } = new();
+
+    public Dictionary<string, SvgPath> SvgFacilities { get; private set; } = new();
 
     public new SkiaSharp.SKPicture? Picture { get; private set; }
 
@@ -28,10 +32,12 @@ public class SKSvgExtended : SKSvg
             Drawable = drawable;
             Picture = SkiaModel.ToSKPicture(Model);
 
-            SvgPathPitches = svgDocument.SvgPathPitches;
-            SvgPathPhotoLoc = svgDocument.SvgPathPhotoLoc;
+            SvgUnits = svgDocument.SvgUnits;
+            SvgPhotoLocations = svgDocument.SvgPhotoLocations;
             SvgRectZones = svgDocument.SvgRectZones;
-            SvgPathCamp = svgDocument.SvgPathCamp;
+            SvgCampColor = svgDocument.SvgCampColor;
+            SvgSubunits = svgDocument.SvgSubunits;
+            SvgFacilities = svgDocument.SvgFacilities;
 
             return Picture;
         }
@@ -50,10 +56,12 @@ public class SKSvgExtended : SKSvg
         Drawable = drawable;
         Picture = SkiaModel.ToSKPicture(Model);
 
-        SvgPathPitches = svgDocument.SvgPathPitches;
-        SvgPathPhotoLoc = svgDocument.SvgPathPhotoLoc;
+        SvgUnits = svgDocument.SvgUnits;
+        SvgPhotoLocations = svgDocument.SvgPhotoLocations;
         SvgRectZones = svgDocument.SvgRectZones;
-        SvgPathCamp = svgDocument.SvgPathCamp;
+        SvgCampColor = svgDocument.SvgCampColor;
+        SvgSubunits = svgDocument.SvgSubunits;
+        SvgFacilities = svgDocument.SvgFacilities;
 
         return Picture;
     }
