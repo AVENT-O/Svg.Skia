@@ -12,6 +12,8 @@ public class SKSvgExtended : SKSvg
     public Dictionary<string, SvgEllipse> SvgPhotoWater { get; private set; } = new();
 
     public Dictionary<string, SvgEllipse> SvgPhotoElectricity { get; private set; } = new();
+    public SvgPath SvgPhotoWaterIcon { get; set; }
+    public SvgPath SvgPhotoElectricityIcon { get; set; }
 
     public Dictionary<string, SvgRectangle> SvgRectZones { get; private set; } = new();
 
@@ -40,6 +42,8 @@ public class SKSvgExtended : SKSvg
             SvgPhotoLocations = svgDocument.SvgPhotoLocations;
             SvgPhotoWater = svgDocument.SvgPhotoWater;
             SvgPhotoElectricity = svgDocument.SvgPhotoElectricity;
+            SvgPhotoWaterIcon = svgDocument.SvgPhotoWaterIcon;
+            SvgPhotoElectricityIcon = svgDocument.SvgPhotoElectricityIcon;  
             SvgRectZones = svgDocument.SvgRectZones;
             SvgCampColor = svgDocument.SvgCampColor;
             SvgSubunits = svgDocument.SvgSubunits;
@@ -66,6 +70,8 @@ public class SKSvgExtended : SKSvg
         SvgPhotoLocations = svgDocument.SvgPhotoLocations;
         SvgPhotoWater = svgDocument.SvgPhotoWater;
         SvgPhotoElectricity = svgDocument.SvgPhotoElectricity;
+        SvgPhotoWaterIcon = svgDocument.SvgPhotoWaterIcon;
+        SvgPhotoElectricityIcon = svgDocument.SvgPhotoElectricityIcon;
         SvgRectZones = svgDocument.SvgRectZones;
         SvgCampColor = svgDocument.SvgCampColor;
         SvgSubunits = svgDocument.SvgSubunits;
