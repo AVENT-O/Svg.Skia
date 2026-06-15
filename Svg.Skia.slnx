@@ -106,6 +106,7 @@
     <Project Path="tests/ShimSkiaSharp.UnitTests/ShimSkiaSharp.UnitTests.csproj" />
     <Project Path="tests/Svg.Skia.Benchmarks/Svg.Skia.Benchmarks.csproj" />
     <Project Path="tests/Svg.Controls.Avalonia.UnitTests/Svg.Controls.Avalonia.UnitTests.csproj" />
+    <Project Path="tests/Svg.Controls.Skia.Avalonia.InvariantGlobalization.UnitTests/Svg.Controls.Skia.Avalonia.InvariantGlobalization.UnitTests.csproj" />
     <Project Path="tests/Svg.Controls.Skia.Avalonia.UnitTests/Svg.Controls.Skia.Avalonia.UnitTests.csproj" />
     <Project Path="tests/Svg.Controls.Skia.Uno.UnitTests/Svg.Controls.Skia.Uno.UnitTests.csproj" />
     <Project Path="tests/Svg.Editor.Skia.Avalonia.UnitTests/Svg.Editor.Skia.Avalonia.UnitTests.csproj" />
