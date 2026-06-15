@@ -16,7 +16,9 @@ namespace Svg.Model.Services;
 
 public static class SvgService
 {
-    public static CultureInfo? s_systemLanguageOverride = CultureInfo.GetCultureInfo("en-US");
+    private const string DefaultSystemLanguageTag = "en-US";
+
+    public static CultureInfo? s_systemLanguageOverride = TryGetCultureInfo(DefaultSystemLanguageTag);
 
     private static readonly char[] s_spaceTab = { ' ', '\t' };
 
@@ -431,8 +433,7 @@ public static class SvgService
             return false;
         }
 
-        var systemLanguage = s_systemLanguageOverride ?? CultureInfo.InstalledUICulture;
-        var systemLanguageTag = GetSystemLanguageTag(systemLanguage);
+        var systemLanguageTag = GetCurrentSystemLanguageTag();
         if (string.IsNullOrWhiteSpace(systemLanguageTag))
         {
             return false;
@@ -447,6 +448,28 @@ public static class SvgService
         }
 
         return false;
+    }
+
+    private static CultureInfo? TryGetCultureInfo(string name)
+    {
+        try
+        {
+            return CultureInfo.GetCultureInfo(name);
+        }
+        catch (CultureNotFoundException)
+        {
+            return null;
+        }
+    }
+
+    private static string? GetCurrentSystemLanguageTag()
+    {
+        if (s_systemLanguageOverride is { } systemLanguageOverride)
+        {
+            return GetSystemLanguageTag(systemLanguageOverride);
+        }
+
+        return GetSystemLanguageTag(CultureInfo.InstalledUICulture) ?? DefaultSystemLanguageTag;
     }
 
     internal static bool PassesConditionalProcessing(this SvgElement svgElement, DrawAttributes ignoreAttributes)
