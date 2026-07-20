@@ -60,6 +60,27 @@ public class SkiaSvgAssetLoaderCachingTests
     }
 
     [Fact]
+    public void MeasureText_IncludesStrokeExpansionInBounds()
+    {
+        var assetLoader = new SkiaSvgAssetLoader(new SkiaModel(new SKSvgSettings()));
+        var fillPaint = CreateTextPaint(48f);
+        var strokePaint = CreateTextPaint(48f);
+        strokePaint.Style = SKPaintStyle.Stroke;
+        strokePaint.StrokeWidth = 18f;
+
+        var fillBounds = default(SKRect);
+        var fillAdvance = assetLoader.MeasureText("Stroke", fillPaint, ref fillBounds);
+        var strokeBounds = default(SKRect);
+        var strokeAdvance = assetLoader.MeasureText("Stroke", strokePaint, ref strokeBounds);
+
+        Assert.Equal(fillAdvance, strokeAdvance, 3);
+        Assert.True(strokeBounds.Left < fillBounds.Left);
+        Assert.True(strokeBounds.Top < fillBounds.Top);
+        Assert.True(strokeBounds.Right > fillBounds.Right);
+        Assert.True(strokeBounds.Bottom > fillBounds.Bottom);
+    }
+
+    [Fact]
     public void FindTypefaces_ReturnsIndependentResultsAndRecomputesAfterPaintMutation()
     {
         var assetLoader = new SkiaSvgAssetLoader(new SkiaModel(new SKSvgSettings()));
@@ -84,6 +105,78 @@ public class SkiaSvgAssetLoaderCachingTests
 
         Assert.Equal(repeated.Count, mutated.Count);
         Assert.True(mutatedAdvance > repeatedAdvance * 2f);
+    }
+
+    [Fact]
+    public void FindTypefaces_SkipsCustomProviderTypefaceMissingRequestedGlyph()
+    {
+        const string family = "SvgSkiaGlyphFallback";
+        using var latinTypeface = OpenNativeTypeface(GetResvgFontPath("NotoSans-Regular.ttf"));
+        using var devanagariTypeface = OpenNativeTypeface(GetResvgFontPath("NotoSansDevanagari-Regular.ttf"));
+        AssertGlyphCoverage(latinTypeface, 0x0915, expected: false);
+        AssertGlyphCoverage(devanagariTypeface, 0x0915, expected: true);
+        var latinProvider = new CountingTypefaceProvider(latinTypeface, family);
+        var devanagariProvider = new CountingTypefaceProvider(devanagariTypeface, family);
+        var assetLoader = new SkiaSvgAssetLoader(new SkiaModel(new SKSvgSettings
+        {
+            TypefaceProviders = new List<ITypefaceProvider> { latinProvider, devanagariProvider }
+        }));
+
+        var spans = FindTypefaces(assetLoader, family, "\u0915");
+
+        var span = Assert.Single(spans);
+        Assert.Equal("\u0915", span.Text);
+        Assert.True(latinProvider.CallCount > 0);
+        Assert.True(devanagariProvider.CallCount > 0);
+    }
+
+    [Fact]
+    public void FindTypefaces_KeepsNoBreakSpaceWithCurrentFontWhenGlyphExists()
+    {
+        const string family = "SvgSkiaGlyphGlue";
+        using var latinTypeface = OpenNativeTypeface(GetResvgFontPath("NotoSans-Regular.ttf"));
+        using var devanagariTypeface = OpenNativeTypeface(GetResvgFontPath("NotoSansDevanagari-Regular.ttf"));
+        AssertGlyphCoverage(latinTypeface, 0x00A0, expected: true);
+        AssertGlyphCoverage(latinTypeface, 0x0915, expected: false);
+        AssertGlyphCoverage(devanagariTypeface, 0x00A0, expected: true);
+        AssertGlyphCoverage(devanagariTypeface, 0x0915, expected: true);
+        var latinProvider = new CountingTypefaceProvider(latinTypeface, family);
+        var devanagariProvider = new CountingTypefaceProvider(devanagariTypeface, family);
+        var assetLoader = new SkiaSvgAssetLoader(new SkiaModel(new SKSvgSettings
+        {
+            TypefaceProviders = new List<ITypefaceProvider> { latinProvider, devanagariProvider }
+        }));
+
+        var spans = FindTypefaces(assetLoader, family, "\u0915\u00A0");
+
+        var span = Assert.Single(spans);
+        Assert.Equal("\u0915\u00A0", span.Text);
+    }
+
+    [Fact]
+    public void FindRunTypeface_DoesNotReturnCandidateTypefaceMissingAnyRequestedGlyph()
+    {
+        const string partialFamily = "SvgSkiaRunPartial";
+        const string latinFamily = "SvgSkiaRunLatin";
+        using var partialTypeface = OpenNativeTypeface(GetResvgFontPath("CFF-and-SBIX.otf"));
+        using var latinTypeface = OpenNativeTypeface(GetResvgFontPath("NotoSans-Regular.ttf"));
+        AssertGlyphCoverage(partialTypeface, 'A', expected: true);
+        AssertGlyphCoverage(partialTypeface, 'G', expected: false);
+        AssertGlyphCoverage(latinTypeface, 'A', expected: true);
+        AssertGlyphCoverage(latinTypeface, 'G', expected: true);
+        var partialProvider = new CountingTypefaceProvider(partialTypeface, partialFamily);
+        var latinProvider = new CountingTypefaceProvider(latinTypeface, latinFamily);
+        var assetLoader = new SkiaSvgAssetLoader(new SkiaModel(new SKSvgSettings
+        {
+            TypefaceProviders = new List<ITypefaceProvider> { partialProvider, latinProvider }
+        }));
+
+        var runTypeface = FindRunTypeface(assetLoader, $"{partialFamily}, {latinFamily}", "AG");
+
+        Assert.NotNull(runTypeface);
+        Assert.NotEqual(partialFamily, runTypeface!.FamilyName);
+        Assert.True(partialProvider.CallCount > 0);
+        Assert.True(latinProvider.CallCount > 0);
     }
 
     [Fact]
@@ -652,8 +745,54 @@ public class SkiaSvgAssetLoaderCachingTests
             "resources",
             name);
 
+    private static string GetResvgFontPath(string name)
+        => Path.Combine(
+            "..",
+            "..",
+            "..",
+            "..",
+            "..",
+            "externals",
+            "resvg",
+            "crates",
+            "resvg",
+            "tests",
+            "fonts",
+            name);
+
+    private static NativeTypeface OpenNativeTypeface(string path)
+    {
+        var fullPath = Path.GetFullPath(path);
+        Assert.True(File.Exists(fullPath), $"Font asset not found: {fullPath}");
+
+        using var stream = File.OpenRead(fullPath);
+        var typeface = NativeTypeface.FromStream(stream);
+        Assert.True(typeface is not null, $"Font asset could not be decoded: {fullPath}");
+        return typeface!;
+    }
+
+    private static void AssertGlyphCoverage(NativeTypeface typeface, int codepoint, bool expected)
+    {
+        using var font = new SkiaSharp.SKFont(typeface);
+        Assert.Equal(expected, font.ContainsGlyph(codepoint));
+    }
+
     private sealed class CountingTypefaceProvider : ITypefaceProvider
     {
+        private static readonly char[] s_fontFamilyTrim = { '\'' };
+        private readonly NativeTypeface? _typeface;
+        private readonly HashSet<string>? _familyNames;
+
+        public CountingTypefaceProvider()
+        {
+        }
+
+        public CountingTypefaceProvider(NativeTypeface typeface, params string[] familyNames)
+        {
+            _typeface = typeface;
+            _familyNames = new HashSet<string>(familyNames, StringComparer.OrdinalIgnoreCase);
+        }
+
         public int CallCount { get; private set; }
 
         public NativeTypeface? FromFamilyName(
@@ -663,6 +802,29 @@ public class SkiaSvgAssetLoaderCachingTests
             NativeTypefaceSlant fontStyle)
         {
             CallCount++;
+            if (_typeface is null ||
+                _typeface.Handle == IntPtr.Zero ||
+                _typeface.FontStyle.Weight != (int)fontWeight ||
+                _typeface.FontStyle.Width != (int)fontWidth ||
+                _typeface.FontStyle.Slant != fontStyle)
+            {
+                return null;
+            }
+
+            if (_familyNames is null || _familyNames.Count == 0)
+            {
+                return _typeface;
+            }
+
+            var families = fontFamily.Split(',');
+            for (var i = 0; i < families.Length; i++)
+            {
+                if (_familyNames.Contains(families[i].Trim().Trim(s_fontFamilyTrim)))
+                {
+                    return _typeface;
+                }
+            }
+
             return null;
         }
     }

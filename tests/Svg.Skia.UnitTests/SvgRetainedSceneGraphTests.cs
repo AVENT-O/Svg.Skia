@@ -2185,9 +2185,15 @@ public class SvgRetainedSceneGraphTests : SvgUnitTest
         Assert.NotNull(retainedModel);
 
         var latin = Assert.Single(retainedModel!.FindCommandsBySourceElementId<DrawTextCanvasCommand>("latin"));
-        var cjk = Assert.Single(retainedModel.FindCommandsBySourceElementId<DrawTextCanvasCommand>("cjk"));
 
-        Assert.True(cjk.Y < latin.Y, $"Expected use-script CJK text to select an ideographic baseline above alphabetic, but was {cjk.Y} vs {latin.Y}.");
+        // CJK text may split into multiple typeface runs depending on platform font fallback
+        // (for example, Linux CI runners lack a single font covering both glyphs). Every run shares
+        // the element baseline, so assert the use-script ideographic baseline selection on each run
+        // rather than requiring the text to resolve to exactly one typeface run.
+        var cjkCommands = retainedModel.FindCommandsBySourceElementId<DrawTextCanvasCommand>("cjk").ToList();
+        Assert.NotEmpty(cjkCommands);
+        Assert.All(cjkCommands, cjk =>
+            Assert.True(cjk.Y < latin.Y, $"Expected use-script CJK text to select an ideographic baseline above alphabetic, but was {cjk.Y} vs {latin.Y}."));
     }
 
     [Fact]
@@ -2242,6 +2248,28 @@ public class SvgRetainedSceneGraphTests : SvgUnitTest
         Assert.Equal("'liga' 0, 'kern' 1", draw.Paint!.FontFeatureSettings);
         Assert.Equal("none", draw.Paint.FontKerning);
         Assert.Equal("no-common-ligatures discretionary-ligatures", draw.Paint.FontVariantLigatures);
+    }
+
+    [Fact]
+    public void RetainedSceneGraph_InheritedLanguageFlowsIntoTextPaint()
+    {
+        const string languageSvg = """
+            <svg xmlns="http://www.w3.org/2000/svg" width="220" height="80" viewBox="0 0 220 80">
+              <g xml:lang="zh_HANT">
+                <text id="localized" x="10" y="40" font-size="24">刃直海角骨入</text>
+              </g>
+            </svg>
+            """;
+
+        using var svg = new SKSvg();
+        svg.FromSvg(languageSvg);
+
+        var retainedModel = svg.CreateRetainedSceneGraphModel();
+        Assert.NotNull(retainedModel);
+
+        var draws = retainedModel!.FindCommandsBySourceElementId<DrawTextCanvasCommand>("localized").ToList();
+        Assert.NotEmpty(draws);
+        Assert.All(draws, draw => Assert.Equal("zh-HANT", draw.Paint!.FontLanguage));
     }
 
     [Fact]
