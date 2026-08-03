@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AvaloniaVersion>12.0.0</AvaloniaVersion>
-    <SkiaSharpVersion Condition="'$(SkiaSharpVersion)' == ''">4.150.1</SkiaSharpVersion>
+    <SkiaSharpVersion Condition="'$(SkiaSharpVersion)' == ''">4.151.0</SkiaSharpVersion>
     <HarfBuzzSharpVersion Condition="'$(HarfBuzzSharpVersion)' == ''">14.2.1.1</HarfBuzzSharpVersion>
   </PropertyGroup>
   <ItemGroup>
