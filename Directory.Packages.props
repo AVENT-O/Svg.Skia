@@ -2,8 +2,8 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AvaloniaVersion>12.0.0</AvaloniaVersion>
-    <SkiaSharpVersion Condition="'$(SkiaSharpVersion)' == ''">4.151.2</SkiaSharpVersion>
-    <HarfBuzzSharpVersion Condition="'$(HarfBuzzSharpVersion)' == ''">14.2.1.1</HarfBuzzSharpVersion>
+    <SkiaSharpVersion Condition="'$(SkiaSharpVersion)' == ''">4.152.0</SkiaSharpVersion>
+    <HarfBuzzSharpVersion Condition="'$(HarfBuzzSharpVersion)' == ''">14.2.1.200</HarfBuzzSharpVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
@@ -22,7 +22,7 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
     <PackageVersion Include="Mono.Cecil" Version="0.11.6" />
     <PackageVersion Include="Svg" Version="3.4.4" />
-    <PackageVersion Include="ExCSS" Version="4.3.1" />
+    <PackageVersion Include="ExCSS" Version="4.3.2" />
     <PackageVersion Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
     <PackageVersion Include="SkiaSharp.Views.Maui.Controls" Version="$(SkiaSharpVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="$(SkiaSharpVersion)" />
@@ -39,7 +39,7 @@
     <PackageVersion Include="System.Text.Json" Version="9.0.9" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta1.20371.2" />
     <PackageVersion Include="Jint" Version="4.8.0" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
     <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
     <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.11" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
