@@ -1,22 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Library</OutputType>
     <IsPackable>False</IsPackable>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <Import Project="..\..\build\Base.props" />
   <Import Project="..\..\build\ReferenceAssemblies.props" />
   <Import Project="..\..\build\XUnit.props" />
-  <Import Project="..\..\build\ImageSharp.props" />
+  <Import Project="..\..\build\SixLabors.ImageSharp.props" />
   <Import Project="..\..\build\SkiaSharp.props" />
-  <Import Project="..\..\build\SkiaSharp.Linux.props" />
-  <Import Project="..\..\build\HarfBuzzSharp.NativeAssets.Linux.props" />
+  <Import Project="..\..\build\SkiaSharp.Native.props" />
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Svg.CodeGen.Skia\Svg.CodeGen.Skia.csproj" />
+    <ProjectReference Include="..\..\src\Svg.JavaScript\Svg.JavaScript.csproj" />
     <ProjectReference Include="..\..\src\Svg.Skia\Svg.Skia.csproj" />
+    <ProjectReference Include="..\..\src\Svg.Skia.JavaScript\Svg.Skia.JavaScript.csproj" />
   </ItemGroup>
 
 </Project>

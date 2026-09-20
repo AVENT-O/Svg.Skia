@@ -2,7 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Svg.Controls.Skia.Avalonia"
+        xmlns:local="clr-namespace:AvaloniaSvgSkiaSample"
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
         x:Class="AvaloniaSvgSkiaSample.MainWindow"
         Width="900" Height="600" WindowStartupLocation="CenterScreen"
@@ -96,6 +97,20 @@
       </DockPanel>
     </TabItem>
 
+    <TabItem Header="Model">
+      <DockPanel Background="Transparent" 
+                 Margin="16" 
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*">
+          <TextBlock Text="Original" />
+          <TextBlock Grid.Column="1" Text="Clone (Grayscale)" />
+          <Image Grid.Row="1" Name="svgModelOriginal" />
+          <Image Grid.Row="1" Grid.Column="1" Name="svgModelModified" />
+        </Grid>
+      </DockPanel>
+    </TabItem>
+
     <TabItem Header="Resource">
       <DockPanel x:Name="svgResourceDockPanel" 
                  Background="Transparent" 
@@ -125,6 +140,30 @@
       </Panel>
     </TabItem>
 
+    <TabItem Header="Background">
+      <Panel Margin="16" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Border CornerRadius="12"
+                Background="{SvgImage /Assets/__tiger.svg}" />
+      </Panel>
+    </TabItem>
+    
+    <TabItem Header="Background (SvgResource)">
+      <Panel Margin="16" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Border CornerRadius="12"
+                Background="{SvgResource /Assets/__tiger.svg}" />
+      </Panel>
+    </TabItem>
+
+    <TabItem Header="Background (Resources)">
+      <TabItem.Resources>
+        <svg:SvgResource x:Key="__tiger">/Assets/__tiger.svg</svg:SvgResource>
+      </TabItem.Resources>
+      <Panel Margin="16" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Border CornerRadius="12"
+                Background="{DynamicResource __tiger}" />
+      </Panel>
+    </TabItem>
+
     <TabItem Header="String">
       <DockPanel x:Name="svgStringDockPanel" 
                  Background="Transparent" 
@@ -139,13 +178,31 @@
           <ComboBoxItem>UniformToFill</ComboBoxItem>
         </ComboBox>
         <Grid ColumnDefinitions="50*,8,50*">
-          <Svg Grid.Column="0" Name="svgString" Source="{Binding #stringTextBox.Text}" />
+          <Svg Grid.Column="0" Name="svgString" 
+               Source="{Binding #stringTextBox.Text}"
+               Css="{Binding #cssTextBox.Text}" />
           <GridSplitter Grid.Column="1" />
-          <TextBox Grid.Column="2" Name="stringTextBox" AcceptsReturn="True" AcceptsTab="True" />
+          <Grid Grid.Column="2" RowDefinitions="Auto,50*,Auto,30*">
+            <TextBlock Grid.Row="0" Text="Svg" />
+            <TextBox Grid.Row="1" Name="stringTextBox" AcceptsReturn="True" AcceptsTab="True" />
+            <TextBlock Grid.Row="2" Text="Svg" />
+            <TextBox Grid.Row="3" Name="cssTextBox" AcceptsReturn="True" AcceptsTab="True" />
+          </Grid>
         </Grid>
       </DockPanel>
     </TabItem>
 
+    <TabItem Header="Context.Draw()">
+      <DockPanel x:Name="svgDrawDockPanel" 
+                 Background="Transparent" 
+                 Margin="16" 
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch" 
+                 DragDrop.AllowDrop="True">
+        <local:DrawControl Image="{SvgImage /Assets/__tiger.svg}" />
+      </DockPanel>
+    </TabItem>
+    
   </TabControl>
 
 </Window>

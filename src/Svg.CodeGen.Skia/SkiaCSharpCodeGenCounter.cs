@@ -1,4 +1,6 @@
-﻿namespace Svg.CodeGen.Skia;
+﻿// Copyright (c) Wiesław Šoltés. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+namespace Svg.CodeGen.Skia;
 
 public class SkiaCSharpCodeGenCounter
 {
@@ -28,6 +30,8 @@ public class SkiaCSharpCodeGenCounter
 
     public int Image { get; set; } = -1;
 
+    public int Matrix { get; set; } = -1;
+
     public string PictureVarName { get; set; } = "skPicture";
 
     public string PictureRecorderVarName { get; set; } = "skPictureRecorder";
@@ -53,6 +57,8 @@ public class SkiaCSharpCodeGenCounter
     public string PathVarName { get; set; } = "skPath";
 
     public string ImageVarName { get; set; } = "skImage";
+
+    public string MatrixVarName { get; set; } = "skMatrix";
 
     public string FontManagerVarName { get; set; } = "skFontManager";
 

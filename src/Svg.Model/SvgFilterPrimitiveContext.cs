@@ -1,11 +1,18 @@
-﻿using Svg.FilterEffects;
+﻿// Copyright (c) Wiesław Šoltés. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
 using ShimSkiaSharp;
+using Svg.FilterEffects;
 
 namespace Svg.Model;
 
-internal class SvgFilterPrimitiveContext(SvgFilterPrimitive svgFilterPrimitive)
+internal class SvgFilterPrimitiveContext
 {
-    public SvgFilterPrimitive FilterPrimitive { get; } = svgFilterPrimitive;
+    public SvgFilterPrimitiveContext(SvgFilterPrimitive svgFilterPrimitive)
+    {
+        FilterPrimitive = svgFilterPrimitive;
+    }
+
+    public SvgFilterPrimitive FilterPrimitive { get; }
 
     public SKRect Boundaries { get; set; }
 

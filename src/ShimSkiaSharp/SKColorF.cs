@@ -1,15 +1,25 @@
-﻿using System;
+﻿// Copyright (c) Wiesław Šoltés. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+using System;
 
 namespace ShimSkiaSharp;
 
-public readonly struct SKColorF(float red, float green, float blue, float alpha)
+public readonly struct SKColorF
 {
-    public float Red { get; } = red;
-    public float Green { get; } = green;
-    public float Blue { get; } = blue;
-    public float Alpha { get; } = alpha;
+    public float Red { get; }
+    public float Green { get; }
+    public float Blue { get; }
+    public float Alpha { get; }
 
     public static readonly SKColorF Empty = default;
+
+    public SKColorF(float red, float green, float blue, float alpha)
+    {
+        Red = red;
+        Green = green;
+        Blue = blue;
+        Alpha = alpha;
+    }
 
     public static implicit operator SKColor(SKColorF color)
     {
@@ -20,6 +30,6 @@ public readonly struct SKColorF(float red, float green, float blue, float alpha)
             (byte)(color.Alpha * 255.0f));
     }
 
-    public override string ToString() 
+    public override string ToString()
         => FormattableString.Invariant($"{Red}, {Green}, {Blue}, {Alpha}");
 }

@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Avalonia.Svg"
+        xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Svg.Controls.Avalonia"
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
         x:Class="AvaloniaSvgSample.MainWindow"
         Width="900" Height="600" WindowStartupLocation="CenterScreen"
@@ -78,6 +78,20 @@
       </DockPanel>
     </TabItem>
 
+    <TabItem Header="Model">
+      <DockPanel Background="Transparent" 
+                 Margin="16" 
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch">
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*">
+          <TextBlock Text="Original" />
+          <TextBlock Grid.Column="1" Text="Clone (Grayscale)" />
+          <Image Grid.Row="1" Name="svgModelOriginal" />
+          <Image Grid.Row="1" Grid.Column="1" Name="svgModelModified" />
+        </Grid>
+      </DockPanel>
+    </TabItem>
+
     <TabItem Header="Resource">
       <DockPanel x:Name="svgResourceDockPanel" 
                  Background="Transparent" 
@@ -102,6 +116,30 @@
     <TabItem Header="Content">
       <Panel Margin="16" VerticalAlignment="Center" HorizontalAlignment="Center">
         <Button Content="{SvgImage /Assets/__tiger.svg}" Background="Transparent" Width="100" Height="100" />
+      </Panel>
+    </TabItem>
+
+    <TabItem Header="Background">
+      <Panel Margin="16" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Border CornerRadius="12"
+                Background="{SvgImage /Assets/__tiger.svg}" />
+      </Panel>
+    </TabItem>
+
+    <TabItem Header="Background (SvgResource)">
+      <Panel Margin="16" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Border CornerRadius="12"
+                Background="{SvgResource /Assets/__tiger.svg}" />
+      </Panel>
+    </TabItem>
+
+    <TabItem Header="Background (Resources)">
+      <TabItem.Resources>
+        <svg:SvgResource x:Key="__tiger">/Assets/__tiger.svg</svg:SvgResource>
+      </TabItem.Resources>
+      <Panel Margin="16" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Border CornerRadius="12"
+                Background="{DynamicResource __tiger}" />
       </Panel>
     </TabItem>
 

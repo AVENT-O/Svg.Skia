@@ -1,48 +1,40 @@
-﻿using System;
+﻿// Copyright (c) Wiesław Šoltés. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+using System;
 
 namespace ShimSkiaSharp;
 
-public struct SKMatrix(
-    float scaleX,
-    float skewX,
-    float transX,
-    float skewY,
-    float scaleY,
-    float transY,
-    float persp0,
-    float persp1,
-    float persp2)
-    : IEquatable<SKMatrix>
+public struct SKMatrix : IEquatable<SKMatrix>
 {
-    public float ScaleX { get; set; } = scaleX;
+    public float ScaleX { get; set; }
 
-    public float SkewX { get; set; } = skewX;
+    public float SkewX { get; set; }
 
-    public float TransX { get; set; } = transX;
+    public float TransX { get; set; }
 
-    public float ScaleY { get; set; } = scaleY;
+    public float ScaleY { get; set; }
 
-    public float SkewY { get; set; } = skewY;
+    public float SkewY { get; set; }
 
-    public float TransY { get; set; } = transY;
+    public float TransY { get; set; }
 
-    public float Persp0 { get; set; } = persp0;
+    public float Persp0 { get; set; }
 
-    public float Persp1 { get; set; } = persp1;
+    public float Persp1 { get; set; }
 
-    public float Persp2 { get; set; } = persp2;
+    public float Persp2 { get; set; }
 
     internal const float DegreesToRadians = (float)Math.PI / 180.0f;
 
     public static readonly SKMatrix Empty;
 
-    public static readonly SKMatrix Identity = new() {ScaleX = 1, ScaleY = 1, Persp2 = 1};
+    public static readonly SKMatrix Identity = new() { ScaleX = 1, ScaleY = 1, Persp2 = 1 };
 
     public bool IsIdentity => Equals(Identity);
 
     public static SKMatrix CreateIdentity()
     {
-        return new() {ScaleX = 1, ScaleY = 1, Persp2 = 1};
+        return new() { ScaleX = 1, ScaleY = 1, Persp2 = 1 };
     }
 
     public static SKMatrix CreateTranslation(float x, float y)
@@ -221,6 +213,19 @@ public struct SKMatrix(
         };
     }
 
+    public SKMatrix(float scaleX, float skewX, float transX, float skewY, float scaleY, float transY, float persp0, float persp1, float persp2)
+    {
+        ScaleX = scaleX;
+        SkewX = skewX;
+        TransX = transX;
+        SkewY = skewY;
+        ScaleY = scaleY;
+        TransY = transY;
+        Persp0 = persp0;
+        Persp1 = persp1;
+        Persp2 = persp2;
+    }
+
     public readonly SKMatrix PreConcat(SKMatrix matrix)
     {
         return Concat(this, matrix);
@@ -233,16 +238,56 @@ public struct SKMatrix(
 
     public readonly SKRect MapRect(SKRect source)
     {
-        var left = source.Left;
-        var top = source.Top;
-        var right = source.Right;
-        var bottom = source.Bottom;
-        // TODO: MapRect
-        return new SKRect(
-            left * ScaleX + top * SkewX + TransX,
-            left * SkewY + top * ScaleY + TransY,
-            right * ScaleX + bottom * SkewX + TransX,
-            right * SkewY + bottom * ScaleY + TransY);
+        var tl = MapPoint(new SKPoint(source.Left, source.Top));
+        var tr = MapPoint(new SKPoint(source.Right, source.Top));
+        var br = MapPoint(new SKPoint(source.Right, source.Bottom));
+        var bl = MapPoint(new SKPoint(source.Left, source.Bottom));
+
+        var left = Math.Min(Math.Min(tl.X, tr.X), Math.Min(br.X, bl.X));
+        var top = Math.Min(Math.Min(tl.Y, tr.Y), Math.Min(br.Y, bl.Y));
+        var right = Math.Max(Math.Max(tl.X, tr.X), Math.Max(br.X, bl.X));
+        var bottom = Math.Max(Math.Max(tl.Y, tr.Y), Math.Max(br.Y, bl.Y));
+
+        return new SKRect(left, top, right, bottom);
+    }
+
+    public void MapRect(ref SKRect rect)
+    {
+        rect = MapRect(rect);
+    }
+
+    public readonly SKPoint MapPoint(SKPoint source)
+    {
+        return new SKPoint(
+            source.X * ScaleX + source.Y * SkewX + TransX,
+            source.X * SkewY + source.Y * ScaleY + TransY);
+    }
+
+    public bool TryInvert(out SKMatrix inverse)
+    {
+        var det = ScaleX * ScaleY - SkewX * SkewY;
+        if (det == 0)
+        {
+            inverse = Identity;
+            return false;
+        }
+
+        var invDet = 1f / det;
+
+        inverse = new SKMatrix
+        {
+            ScaleX = ScaleY * invDet,
+            SkewX = -SkewX * invDet,
+            TransX = (SkewX * TransY - ScaleY * TransX) * invDet,
+            SkewY = -SkewY * invDet,
+            ScaleY = ScaleX * invDet,
+            TransY = (SkewY * TransX - ScaleX * TransY) * invDet,
+            Persp0 = 0,
+            Persp1 = 0,
+            Persp2 = 1
+        };
+
+        return true;
     }
 
     public bool Equals(SKMatrix other)

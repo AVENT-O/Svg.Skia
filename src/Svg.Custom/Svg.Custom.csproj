@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net6.0;net8.0;net10.0</TargetFrameworks>
     <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
     <EnableDefaultItems>False</EnableDefaultItems>
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
@@ -14,6 +14,18 @@
     <DefineConstants>$(DefineConstants);NO_SDC</DefineConstants>
   </PropertyGroup>
 
+  <!-- Trimming parameters -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">
+    <IsTrimmable>true</IsTrimmable>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+  </PropertyGroup>
+  <!-- AOT parameters -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
+  </PropertyGroup>
+
   <PropertyGroup>
     <Description>Custom build of the SVG rendering library.</Description>
     <PackageId>Svg.Custom</PackageId>
@@ -21,7 +33,6 @@
     <PackageTags>svg;vector graphics;rendering;2d;graphics;geometry;shapes</PackageTags>
   </PropertyGroup>
 
-  <Import Project="..\..\build\Base.props" />
   <Import Project="..\..\build\SourceLink.props" />
   <Import Project="..\..\build\SignAssembly.props" />
   <Import Project="..\..\build\ReferenceAssemblies.props" />
@@ -43,7 +54,22 @@
     <Compile Include="**\*.cs" Exclude="bin\**;obj\**" />
     <Compile Include="$(SvgSourcesBasePath)\Source\**\*.cs" Exclude="$(SvgSourcesBasePath)\Source\obj\**" />
     <Compile Remove="$(SvgSourcesBasePath)\Source\Properties\AssemblyInfo.cs" />
+    <!--
+      Keep these fixes in Svg.Custom instead of carrying long-lived edits in externals/SVG.
+      The local copies below document why we diverge from upstream and let us compare our
+      retained-scene/browser-focused behavior against the original parser/runtime logic.
+    -->
+    <Compile Remove="$(SvgSourcesBasePath)\Source\SvgAttributeCollection.cs" />
+    <Compile Remove="$(SvgSourcesBasePath)\Source\Painting\SvgDeferredPaintServer.cs" />
+    <Compile Remove="$(SvgSourcesBasePath)\Source\Painting\SvgGradientServer.cs" />
+    <Compile Remove="$(SvgSourcesBasePath)\Source\Painting\SvgGradientStop.cs" />
+    <Compile Remove="$(SvgSourcesBasePath)\Source\Painting\SvgPatternServer.cs" />
+    <Compile Remove="$(SvgSourcesBasePath)\Source\Painting\SvgPaintServerFactory.cs" />
+    <Compile Remove="$(SvgSourcesBasePath)\Source\Css\ExCssQuery.cs" />
+    <Compile Remove="$(SvgSourcesBasePath)\Source\Css\ExSvgElementOps.cs" />
+    <Compile Remove="$(SvgSourcesBasePath)\Source\Paths\SvgPathBuilder.cs" />
     <Compile Remove="$(SvgSourcesBasePath)\Source\Resources\svg11.dtd" />
+    <Compile Remove="$(SvgSourcesBasePath)\Source\SvgElementFactory.cs" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
@@ -54,16 +80,8 @@
     <DefineConstants>$(DefineConstants);NETCORE;NET6</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net8.0'">
-    <DefineConstants>$(DefineConstants);NETCORE;NET8</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="System.Memory" Version="4.5.5" />
-  </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="ExCSS" Version="4.2.3" />
+    <PackageReference Include="ExCSS" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -71,7 +89,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(SvgSourcesBasePath)\Generators\Svg.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\externals\Svg.Generators\Svg.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Memory" />
   </ItemGroup>
 
 </Project>

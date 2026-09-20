@@ -1,7 +1,7 @@
 ﻿using System;
 using Avalonia;
-using Avalonia.ReactiveUI;
 using Avalonia.Svg.Skia;
+using Svg.Skia;
 
 namespace TestApp;
 
@@ -12,6 +12,8 @@ class Program
     {
         try
         {
+            SKSvgJavaScriptRuntime.Register();
+            SvgSource.s_skiaModel.Settings.EnableJavaScript = true;
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception e)
@@ -24,11 +26,23 @@ class Program
     {
         GC.KeepAlive(typeof(SvgImageExtension).Assembly);
         GC.KeepAlive(typeof(Avalonia.Svg.Skia.Svg).Assembly);
+#if AVALONIA_PROGPU
+        return AppBuilder.Configure<App>()
+            .UseSilkNet()
+            .UseSkia()
+            .With(new Avalonia.Rendering.Composition.CompositionOptions
+            {
+                UseRegionDirtyRectClipping = false
+            })
+            .UseHarfBuzz()
+            .WithInterFont()
+            .LogToTrace();
+#else
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .With(new X11PlatformOptions { })
             .LogToTrace()
-            .UseSkia()
-            .UseReactiveUI();
+            .UseSkia();
+#endif
     }
 }

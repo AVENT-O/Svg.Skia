@@ -3,7 +3,11 @@ using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+#if !AVALONIA_PROGPU
+using Avalonia.Diagnostics;
+#endif
 using Avalonia.Markup.Xaml;
+using TestApp.Services;
 using TestApp.ViewModels;
 using TestApp.Views;
 
@@ -20,7 +24,7 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        var mainWindowViewModel = new MainWindowViewModel();
+        var mainWindowViewModel = new MainWindowViewModel(new StorageService());
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -74,9 +78,12 @@ public class App : Application
             {
                 using var stream = File.OpenWrite(ConfigurationPath);
                 mainWindowViewModel.SaveConfiguration(stream);
-            }; 
+            };
         }
 
         base.OnFrameworkInitializationCompleted();
+#if DEBUG && !AVALONIA_PROGPU
+        this.AttachDevTools();
+#endif
     }
 }

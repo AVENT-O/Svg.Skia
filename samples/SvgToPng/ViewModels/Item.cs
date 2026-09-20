@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Svg;
 using ShimSkiaSharp;
+using Svg;
 
 namespace SvgToPng.ViewModels;
 
@@ -24,9 +24,6 @@ public class Item : IDisposable
     public SvgDocument Document { get; set; }
 
     [IgnoreDataMember]
-    public SKDrawable Drawable { get; set; }
-
-    [IgnoreDataMember]
     public SKPicture Picture { get; set; }
 
     [IgnoreDataMember]
@@ -44,7 +41,6 @@ public class Item : IDisposable
     public void Reset()
     {
         Document = null;
-        Drawable = null;
         Picture = null;
         Code = null;
         SkiaPicture?.Dispose();

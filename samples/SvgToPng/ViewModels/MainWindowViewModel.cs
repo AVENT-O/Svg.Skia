@@ -9,6 +9,7 @@ using System.Windows.Data;
 using Newtonsoft.Json;
 using Svg.CodeGen.Skia;
 using Svg.Model;
+using Svg.Model.Services;
 using Svg.Skia;
 
 namespace SvgToPng.ViewModels;
@@ -18,8 +19,8 @@ public class MainWindowViewModel
 {
     private readonly SKSvgSettings _settings;
     private readonly SkiaModel _skiaModel;
-    private readonly IAssetLoader _assetLoader;
-    
+    private readonly ISvgAssetLoader _assetLoader;
+
     [DataMember]
     public ObservableCollection<Item> Items { get; set; }
 
@@ -51,7 +52,7 @@ public class MainWindowViewModel
     {
         _settings = new SKSvgSettings();
         _skiaModel = new SkiaModel(_settings);
-        _assetLoader = new SkiaAssetLoader(_skiaModel);
+        _assetLoader = new SkiaSvgAssetLoader(_skiaModel);
     }
 
     public void CreateItemsView()
@@ -115,7 +116,7 @@ public class MainWindowViewModel
             }
 
             var stopwatchOpen = Stopwatch.StartNew();
-            item.Document = SvgExtensions.Open(item.SvgPath);
+            item.Document = SvgService.Open(item.SvgPath);
             stopwatchOpen.Stop();
             statusOpen?.Invoke($"{Math.Round(stopwatchOpen.Elapsed.TotalMilliseconds, 3)}ms");
             Debug.WriteLine($"Open: {Math.Round(stopwatchOpen.Elapsed.TotalMilliseconds, 3)}ms");
@@ -124,12 +125,9 @@ public class MainWindowViewModel
             {
                 var stopwatchToPicture = Stopwatch.StartNew();
 
-                var references = new HashSet<Uri> {item.Document.BaseUri};
-                item.Drawable = SvgExtensions.ToDrawable(item.Document, _assetLoader, references, out var bounds);
-                if (item.Drawable is { } && bounds is { })
+                item.Picture = SvgSceneRuntime.CreateModel(item.Document, _assetLoader);
+                if (item.Picture is { })
                 {
-                    item.Picture = item.Drawable.Snapshot(bounds.Value);
-
                     item.SkiaPicture = _skiaModel.ToSKPicture(item.Picture);
 
                     if (item.Picture?.Commands is { })
@@ -257,7 +255,7 @@ public class MainWindowViewModel
 
         if (string.Compare(extension, ".pdf", StringComparison.OrdinalIgnoreCase) == 0)
         {
-            var svg = SvgExtensions.Open(svgPath);
+            var svg = SvgService.Open(svgPath);
             if (svg is { })
             {
                 using var picture = SKSvg.ToPicture(svg, _skiaModel, _assetLoader);
@@ -269,7 +267,7 @@ public class MainWindowViewModel
         }
         else if (string.Compare(extension, ".xps", StringComparison.OrdinalIgnoreCase) == 0)
         {
-            var svg = SvgExtensions.Open(svgPath);
+            var svg = SvgService.Open(svgPath);
             if (svg is { })
             {
                 using var picture = SKSvg.ToPicture(svg, _skiaModel, _assetLoader);
@@ -281,7 +279,7 @@ public class MainWindowViewModel
         }
         else if (string.Compare(extension, ".svg", StringComparison.OrdinalIgnoreCase) == 0)
         {
-            var svg = SvgExtensions.Open(svgPath);
+            var svg = SvgService.Open(svgPath);
             if (svg is { })
             {
                 using var picture = SKSvg.ToPicture(svg, _skiaModel, _assetLoader);
@@ -293,7 +291,7 @@ public class MainWindowViewModel
         }
         else if (string.Compare(extension, ".jpeg", StringComparison.OrdinalIgnoreCase) == 0)
         {
-            var svg = SvgExtensions.Open(svgPath);
+            var svg = SvgService.Open(svgPath);
             if (svg is { })
             {
                 using var picture = SKSvg.ToPicture(svg, _skiaModel, _assetLoader);
@@ -307,7 +305,7 @@ public class MainWindowViewModel
         }
         else if (string.Compare(extension, ".jpg", StringComparison.OrdinalIgnoreCase) == 0)
         {
-            var svg = SvgExtensions.Open(svgPath);
+            var svg = SvgService.Open(svgPath);
             if (svg is { })
             {
                 using var picture = SKSvg.ToPicture(svg, _skiaModel, _assetLoader);
@@ -321,7 +319,7 @@ public class MainWindowViewModel
         }
         else if (string.Compare(extension, ".png", StringComparison.OrdinalIgnoreCase) == 0)
         {
-            var svg = SvgExtensions.Open(svgPath);
+            var svg = SvgService.Open(svgPath);
             if (svg is { })
             {
                 using var picture = SKSvg.ToPicture(svg, _skiaModel, _assetLoader);
@@ -335,7 +333,7 @@ public class MainWindowViewModel
         }
         else if (string.Compare(extension, ".webp", StringComparison.OrdinalIgnoreCase) == 0)
         {
-            var svg = SvgExtensions.Open(svgPath);
+            var svg = SvgService.Open(svgPath);
             if (svg is { })
             {
                 using var picture = SKSvg.ToPicture(svg, _skiaModel, _assetLoader);
